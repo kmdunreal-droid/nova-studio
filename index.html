@@ -57,16 +57,16 @@
   #navbar{
     position:fixed;top:0;left:0;right:0;z-index:30;
     display:flex;align-items:center;justify-content:space-between;
-    padding:20px clamp(20px,5vw,64px);
+    padding:0;margin:0;
     transition:.35s;
     animation:fadeDown .9s cubic-bezier(.2,.7,.2,1) both;
   }
   #navbar.scrolled{
     background:rgba(5,8,16,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-    border-bottom:1px solid rgba(255,255,255,.07);padding:12px clamp(20px,5vw,64px);
+    border-bottom:1px solid rgba(255,255,255,.07);padding:0;margin:0;
   }
   .logo{display:flex;align-items:center;gap:11px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;letter-spacing:.5px;cursor:pointer}
-  .logo .mark{height:150px;width:auto;flex:none;filter:drop-shadow(0 0 12px rgba(37,99,235,.5)) drop-shadow(0 0 26px rgba(34,211,238,.25));object-fit:contain}
+  .logo .mark{height:90px;width:auto;flex:none;filter:drop-shadow(0 0 12px rgba(37,99,235,.5)) drop-shadow(0 0 26px rgba(34,211,238,.25));object-fit:contain}
   .logo .txt{
     background:linear-gradient(100deg,var(--blue),var(--teal) 55%,var(--orange));
     -webkit-background-clip:text;background-clip:text;color:transparent;
