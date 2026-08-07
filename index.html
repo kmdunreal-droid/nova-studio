@@ -430,6 +430,18 @@
     .page .sec-head{margin-bottom:50px}
     @media (min-width:1100px){.work-grid{grid-template-columns:repeat(4,1fr);gap:22px}}
 
+    /* each stacked page fits the viewport; if content is taller it scrolls inside,
+       then the document scroll moves to the next page. Works on all screen sizes. */
+    .page:not(.page-first){min-height:100vh;height:100vh;max-height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.22) transparent}
+    @supports (height:100dvh){.page:not(.page-first){min-height:100dvh;height:100dvh;max-height:100dvh}}
+    .page:not(.page-first)::-webkit-scrollbar{width:6px;height:6px}
+    .page:not(.page-first)::-webkit-scrollbar-track{background:transparent}
+    .page:not(.page-first)::-webkit-scrollbar-thumb{background:rgba(255,255,255,.22);border-radius:99px}
+    .page.ticker-wrap{justify-content:flex-start}
+    .page.ticker-wrap>*{margin-top:auto;margin-bottom:auto}
+    footer.page{justify-content:flex-start}
+    footer.page>*{margin-top:auto;margin-bottom:auto}
+
   /* ============ HERO HEADING SWAP (blast) ============ */
   .hero-h1-wrap{position:relative}
   .hero-h1-wrap h1{transform-origin:50% 50%;will-change:transform,opacity,filter}
@@ -1758,8 +1770,16 @@
     window.addEventListener('mousemove', onMouseMove);
 
     var last = performance.now();
-    (function tick(now){
-      requestAnimationFrame(tick);
+    var rafId = null;
+    var homeEl = document.getElementById('home');
+    function heroOnScreen(){
+      if (!homeEl) return true;
+      var r = homeEl.getBoundingClientRect();
+      return r.bottom > 0 && r.top < window.innerHeight;
+    }
+    function heroActive(){ return !document.hidden && heroOnScreen(); }
+    function novaTick(now){
+      rafId = requestAnimationFrame(novaTick);
       var t = now * 0.001;
       var dt = Math.min((now - last)/1000, 0.05);
       last = now;
@@ -1788,7 +1808,20 @@
         for (var a=0; a<v.anims.length; a++) v.anims[a](t, dt);
         renderer.render(v.scene, v.camera);
       }
-    })(last);
+    }
+    function syncNova(){
+      if (heroActive()){
+        if (rafId == null){ last = performance.now(); rafId = requestAnimationFrame(novaTick); }
+      } else {
+        if (rafId != null){ cancelAnimationFrame(rafId); rafId = null; }
+      }
+    }
+    syncNova();
+    if ('IntersectionObserver' in window){
+      new IntersectionObserver(syncNova, { threshold: 0.01 }).observe(homeEl || document.body);
+    }
+    document.addEventListener('visibilitychange', syncNova);
+    window.addEventListener('scroll', syncNova, { passive:true });
   }
 
   function onMouseMove(e){
@@ -1796,7 +1829,7 @@
     mouseY = (e.clientY / window.innerHeight) * 2 - 1;
   }
   function resize(){
-    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    DPR = Math.min(window.devicePixelRatio || 1, 1.5);
     var canvas = document.getElementById('nova-canvas');
     canvas.width  = Math.floor(window.innerWidth * DPR);
     canvas.height = Math.floor(window.innerHeight * DPR);
@@ -1865,7 +1898,7 @@
   function rand(a,b){ return a + Math.random()*(b-a); }
 
   var renderer = new THREE.WebGLRenderer({ canvas:canvas, antialias:true, alpha:true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
 
   var scene = new THREE.Scene();
   var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 30);
@@ -1944,12 +1977,15 @@
   resize();
   window.addEventListener('resize', resize);
 
-  var last = performance.now();
-  (function tick(now){
-    requestAnimationFrame(tick);
-    var t = now * 0.001;
-    var dt = Math.min((now - last)/1000, 0.05);
-    last = now;
+    var last = performance.now();
+    var rafId = null;
+    var heroEl = canvas.closest('#home') || canvas.parentElement;
+    function globeActive(){ return !document.hidden && (function(){ var r = heroEl.getBoundingClientRect(); return r.bottom > 0 && r.top < window.innerHeight; })(); }
+    function globeTick(now){
+      rafId = requestAnimationFrame(globeTick);
+      var t = now * 0.001;
+      var dt = Math.min((now - last)/1000, 0.05);
+      last = now;
 
     globe.rotation.y = t * 0.28;
     globe.rotation.x = Math.sin(t * 0.18) * 0.18;
@@ -1983,7 +2019,20 @@
     attrs.needsUpdate = true;
 
     renderer.render(scene, camera);
-  })(last);
+    }
+    function syncGlobe(){
+      if (globeActive()){
+        if (rafId == null){ last = performance.now(); rafId = requestAnimationFrame(globeTick); }
+      } else {
+        if (rafId != null){ cancelAnimationFrame(rafId); rafId = null; }
+      }
+    }
+    syncGlobe();
+    if ('IntersectionObserver' in window){
+      new IntersectionObserver(syncGlobe, { threshold: 0.01 }).observe(heroEl);
+    }
+    document.addEventListener('visibilitychange', syncGlobe);
+    window.addEventListener('scroll', syncGlobe, { passive:true });
 })();
 </script>
 
