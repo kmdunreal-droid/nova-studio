@@ -440,7 +440,8 @@
     .shell > .page:nth-child(9){--pt:37,99,235}
     .page.section{max-width:none;padding-left:clamp(24px,5vw,64px);padding-right:clamp(24px,5vw,64px)}
     .page.section>*{max-width:1200px;margin-left:auto;margin-right:auto}
-    .page.ticker-wrap{max-width:none;padding:110px clamp(24px,5vw,64px) 40px;margin-top:0;display:flex;flex-direction:column;justify-content:center}
+    .page.ticker-wrap{max-width:none;width:100%;min-width:0;padding:110px clamp(24px,5vw,64px) 40px;margin-top:0;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+    .page.ticker-wrap .ticker{min-width:0;max-width:100%}
     .page.ticker-wrap>*{max-width:1200px;width:100%;margin-left:auto;margin-right:auto}
     .page.ticker-wrap .ticker-label{margin-bottom:22px}
     footer.page{margin-top:0;padding-top:90px;display:flex;flex-direction:column;justify-content:center}
@@ -564,10 +565,10 @@
   @keyframes rise{from{opacity:0;transform:translateY(60px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
 
   @supports (height:100dvh){
-    .links{height:100dvh}
     .page{min-height:100dvh}
   }
   @media (max-width:900px){
+    @supports (height:100dvh){ .links{height:100dvh} }
     .links{position:fixed;top:0;right:0;height:100vh;width:min(320px,82vw);flex-direction:column;justify-content:center;gap:28px;background:rgba(7,11,22,.96);backdrop-filter:blur(18px);border-left:1px solid rgba(255,255,255,.08);padding:40px;transform:translateX(100%);transition:.4s;z-index:31;font-size:17px}
     .links.open{transform:none}
     .burger{display:flex}
